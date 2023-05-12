@@ -9,7 +9,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def get_data(url, username, password):
     try:
-        response = requests.get(url, auth=(username, password), verify=False)
+        response = requests.get(url, auth=(username, password), verify=False, timeout=15)
         code = (response.status_code)
         if code == 206 or code == 200:
             data = response.json()
@@ -17,6 +17,9 @@ def get_data(url, username, password):
         else:
             print("UNKNOWN - Authorization failed - code: " + str(code))
             sys.exit(3)
+    except requests.exceptions.ConnectTimeout:
+        print('UNKNOWN - Connection has timed out')
+        sys.exit(3)
     except requests.exceptions.ConnectionError:
         print("UNKNOWN - Connection failed: " + str(sys.exc_info()[1]))
         sys.exit(3)
